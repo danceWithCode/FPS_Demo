@@ -38,11 +38,23 @@ public:
     UFUNCTION()
     void StopJump();
 
+    // 处理发射物射击的函数。
+    UFUNCTION()
+    void Fire();
+
     UPROPERTY(VisibleAnywhere)
     class UCameraComponent* FPSCameraComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* FPSMesh;
+
+    // 枪口相对于摄像机位置的偏移。
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+    FVector MuzzleOffset;
+
+    // 要生成的发射物类。
+    UPROPERTY(EditDefaultsOnly, Category = Projectile)
+    TSubclassOf<class AFPSProjectile> ProjectileClass;
 private:
 	int Double_Jump;
 };
