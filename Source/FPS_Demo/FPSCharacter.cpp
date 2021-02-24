@@ -2,13 +2,35 @@
 
 
 #include "FPSCharacter.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+    // 创造一个摄像机
+    FPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+    check(FPSCameraComponent != nullptr);
 
+    // 将摄像机组件附加到我们的胶囊体组件。
+    FPSCameraComponent->SetupAttachment(CastChecked<USceneComponent, UCapsuleComponent>(GetCapsuleComponent()));
+
+    // 设置摄像机到指定位置
+    FPSCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
+
+    // 启用Pawn控制摄像机旋转。
+    FPSCameraComponent->bUsePawnControlRotation = true;
+
+    FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+    check(FPSMesh != nullptr);
+    FPSMesh->SetOnlyOwnerSee(true);
+    FPSMesh->SetupAttachment(FPSCameraComponent);
+    FPSMesh->bCastDynamicShadow = false;
+    FPSMesh->CastShadow = false;
+    // 所属玩家看不到常规（第三人称）全身网格体。
+    GetMesh()->SetOwnerNoSee(true);
 }
 
 // Called when the game starts or when spawned
@@ -16,14 +38,12 @@ void AFPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
-    Double_Jump = 0;
 }
 
 // Called every frame
 void AFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -53,14 +73,9 @@ void AFPSCharacter::MoveRight(float Value)
 void AFPSCharacter::StartJump()
 {
     bPressedJump = true;
-    Double_Jump++;
 }
 
 void AFPSCharacter::StopJump()
 {
-    if (Double_Jump >= 2)
-    {
-        //bPressedJump = false;
-        Double_Jump = 0;
-    }
+    bPressedJump = false;
 }

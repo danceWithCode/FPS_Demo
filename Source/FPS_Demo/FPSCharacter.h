@@ -38,6 +38,11 @@ public:
     UFUNCTION()
     void StopJump();
 
+    UPROPERTY(VisibleAnywhere)
+    class UCameraComponent* FPSCameraComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* FPSMesh;
 private:
 	int Double_Jump;
 };
