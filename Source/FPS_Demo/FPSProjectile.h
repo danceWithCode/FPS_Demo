@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/ShapeComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "FPSProjectile.generated.h"
 
@@ -20,8 +20,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+public:
 	// 初始化射击方向上发射物速度的函数。
 	void FireInDirection(const FVector& ShootDirection);
+
+    // 当发射物击中物体时会调用的函数。
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -31,5 +36,13 @@ public:
 
     UPROPERTY(VisibleAnywhere, Category = Movement)
     UProjectileMovementComponent* ProjectileMovementComponent;
+
+	//发射物网格体
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UStaticMeshComponent* ProjectileMeshComponent;
+
+	// 发射物材质
+	UPROPERTY(VisibleAnywhere, Category = Movement)
+	UMaterialInstanceDynamic* ProjectileMaterialInstance;
 
 };

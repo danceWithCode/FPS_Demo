@@ -16,6 +16,10 @@ AFPSProjectile::AFPSProjectile()
     {
         // 用球体进行简单的碰撞展示。
         CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+        // 将球体的碰撞配置文件名称设置为"Projectile"。
+        CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
+        // 组件击中某物时调用的事件。
+        CollisionComponent->OnComponentHit.AddDynamic(this, &AFPSProjectile::OnHit);
         // 设置球体的碰撞半径。
         CollisionComponent->InitSphereRadius(15.0f);
         // 将根组件设置为碰撞组件。
@@ -34,6 +38,28 @@ AFPSProjectile::AFPSProjectile()
         ProjectileMovementComponent->Bounciness = 0.3f;
         ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
     }
+
+    if (!ProjectileMeshComponent)
+    {
+        ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
+        static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("'/Game/FB/Sphere.Sphere'"));
+        if (Mesh.Succeeded())
+        {
+            ProjectileMeshComponent->SetStaticMesh(Mesh.Object);
+        }
+    }
+
+    static ConstructorHelpers::FObjectFinder<UMaterial>Material(TEXT("'/Game/FB/SphereMaterial.SphereMaterial'"));
+    if (Material.Succeeded())
+    {
+        ProjectileMaterialInstance = UMaterialInstanceDynamic::Create(Material.Object, ProjectileMeshComponent);
+    }
+    ProjectileMeshComponent->SetMaterial(0, ProjectileMaterialInstance);
+    ProjectileMeshComponent->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
+    ProjectileMeshComponent->SetupAttachment(RootComponent);
+
+    // 3 秒后删除发射物。
+    InitialLifeSpan = 3.0f;
 }
 
 // Called when the game starts or when spawned
@@ -53,4 +79,15 @@ void AFPSProjectile::Tick(float DeltaTime)
 void AFPSProjectile::FireInDirection(const FVector& ShootDirection)
 {
     ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
+}
+
+// 当发射物击中物体时会调用的函数。
+void AFPSProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+    if (OtherActor != this && OtherComponent->IsSimulatingPhysics())
+    {
+        OtherComponent->AddImpulseAtLocation(ProjectileMovementComponent->Velocity * 100.0f, Hit.ImpactPoint);
+    }
+
+    Destroy();
 }
