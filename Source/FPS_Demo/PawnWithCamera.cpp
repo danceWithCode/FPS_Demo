@@ -37,7 +37,6 @@ void APawnWithCamera::Tick(float DeltaTime)
     FRotator NewRotation = GetActorRotation();
     NewRotation.Yaw += CameraInput.X;
     SetActorRotation(NewRotation);
-    
 
 // 旋转摄像机的俯仰角度，但对其进行限制，确保我们始终朝下看
     
@@ -56,7 +55,7 @@ void APawnWithCamera::Tick(float DeltaTime)
         NewLocation += GetActorForwardVector() * MovementInput.X * DeltaTime;
         NewLocation += GetActorRightVector() * MovementInput.Y * DeltaTime;
         SetActorLocation(NewLocation);
-    }    
+    }
 }
 
 // Called to bind functionality to input
@@ -68,6 +67,7 @@ void APawnWithCamera::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     InputComponent->BindAxis("MoveRight", this, &APawnWithCamera::MoveRight);
     InputComponent->BindAxis("LookUp", this, &APawnWithCamera::PitchCamera);
     InputComponent->BindAxis("Turn", this, &APawnWithCamera::YawCamera);
+    InputComponent->BindAxis("Zoom", this, &APawnWithCamera::Zoom);
 }
 
 // 输入函数
@@ -89,4 +89,19 @@ void APawnWithCamera::PitchCamera(float AxisValue)
 void APawnWithCamera::YawCamera(float AxisValue)
 {
     CameraInput.X = AxisValue;
+}
+
+static float GetValueAfterClamp(float Value)
+{
+    return FMath::Clamp<float>(Value, 0.1f, 5.0f);
+}
+
+void APawnWithCamera::Zoom(float AxisValue)
+{
+    if (AxisValue != 0)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Zoom %f"), AxisValue));
+        FVector CurrentScale = StaticMeshComp->GetComponentScale();
+        SetActorRelativeScale3D(FVector(GetValueAfterClamp(CurrentScale.X+AxisValue), GetValueAfterClamp(CurrentScale.Y + AxisValue), GetValueAfterClamp(CurrentScale.Z + AxisValue)));
+    }
 }

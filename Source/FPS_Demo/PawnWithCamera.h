@@ -21,6 +21,7 @@ protected:
     //  ‰»Î±‰¡ø
     FVector2D MovementInput;
     FVector2D CameraInput;
+	
 
 public:	
 	// Called every frame
@@ -33,6 +34,7 @@ public:
     void MoveRight(float AxisValue);
     void PitchCamera(float AxisValue);
     void YawCamera(float AxisValue);
+	void Zoom(float AxisValue);
 public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
