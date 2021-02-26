@@ -45,4 +45,9 @@ public:
     UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SprintArmComp;
 
+	UPROPERTY(EditAnywhere, Category = PawnActions)
+	bool StartRotate;
+
+    UPROPERTY(EditAnywhere, Category = PawnActions)
+    int RotateSpeed;
 };

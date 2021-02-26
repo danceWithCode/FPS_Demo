@@ -56,6 +56,13 @@ void APawnWithCamera::Tick(float DeltaTime)
         NewLocation += GetActorRightVector() * MovementInput.Y * DeltaTime;
         SetActorLocation(NewLocation);
     }
+
+    if (StartRotate)
+    {
+        NewRotation = GetActorRotation();
+        NewRotation.Yaw += DeltaTime* RotateSpeed;
+        SetActorRotation(NewRotation);
+    }
 }
 
 // Called to bind functionality to input
